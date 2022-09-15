@@ -16,11 +16,12 @@ module.exports.getRandomUser = (req, res) => {
 
 // get all user data
 module.exports.getAllUsers = (req, res) => {
+  const limit = req.query.limit
   const existUsers = getUserData();
 
   res.status(200).send({
     success: true,
-    existUsers,
+    existUsers: limit ? existUsers.slice(0, limit) : existUsers,
   });
 };
 
@@ -29,10 +30,9 @@ module.exports.saveRandomUser = (req, res) => {
   const existUsers = getUserData();
   const userData = req.body;
 
-  const { id, gender, name, contact, address, photoUrl } = userData;
+  const { gender, name, contact, address, photoUrl } = userData;
 
   if (
-    id == null ||
     gender == null ||
     name == null ||
     contact == null ||
@@ -42,12 +42,7 @@ module.exports.saveRandomUser = (req, res) => {
     return res.status(401).send({ error: true, message: 'User data missing' });
   }
 
-  const isExist = existUsers.find((user) => user.id == id);
-
-  if (isExist) {
-    return res.status(409).send({ error: true, message: 'user already exist' });
-  }
-
+ userData.id = existUsers.length + 1;
   existUsers.push(userData);
   saveUserData(existUsers);
 

@@ -9,7 +9,9 @@ app.use(express.json());
 
 app.use('/user', router );
 
-
+app.get('/', (req, res) => {
+  res.send('Random user generator api ')
+})
 app.all("*", (req, res) => { 
 res.send("404 Not Found");
 })

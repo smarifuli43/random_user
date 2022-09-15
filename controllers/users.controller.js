@@ -1,31 +1,28 @@
 const { getUserData, saveUserData } = require('../utils/userData');
 
-module.exports.home = (req, res) => {
-  res.status(200).send({
-    success: 'true',
-    message: 'This is home. api connected',
-  });
-};
-
-
 // get random user data
 module.exports.getRandomUser = (req, res) => {
   const existUsers = getUserData();
 
   const randomIndex = Math.floor(Math.random() * existUsers.length);
 
-  const data = existUsers[randomIndex];
-  console.log(data)
+  const randomUser = existUsers[randomIndex];
 
   res.status(200).send({
     success: true,
-    message: 'User data added successfully',
-    // data,
+    randomUser,
   });
 };
 
+
+ // get all user data
 module.exports.getAllUsers = (req, res) => {
-  res.send('all users');
+ const existUsers = getUserData();
+
+  res.status(200).send({
+    success: true,
+    existUsers,
+  });
 };
 
 // Save a random user

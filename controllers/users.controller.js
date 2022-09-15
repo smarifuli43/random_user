@@ -14,10 +14,9 @@ module.exports.getRandomUser = (req, res) => {
   });
 };
 
-
- // get all user data
+// get all user data
 module.exports.getAllUsers = (req, res) => {
- const existUsers = getUserData();
+  const existUsers = getUserData();
 
   res.status(200).send({
     success: true,
@@ -57,13 +56,71 @@ module.exports.saveRandomUser = (req, res) => {
     .send({ success: true, message: 'User data added successfully' });
 };
 
+// user data update
 module.exports.updateUser = (req, res) => {
-  res.send('updated');
-};
-module.exports.bulkUpdate = (req, res) => {
-  res.send('bulk updated');
+  const id = req.params.id;
+  const userData = req.body;
+  const existUsers = getUserData();
+
+  const isExist = existUsers.find((user) => user.id == id);
+  if (!isExist) {
+    return res.status(409).send({ error: true, message: 'User not exist' });
+  }
+
+  const updateUser = existUsers.find((user) => user.id == id);
+
+  userData.gender ? (updateUser.gender = userData.gender) : '';
+  userData.name ? (updateUser.name = userData.name) : '';
+  userData.contact ? (updateUser.contact = userData.contact) : '';
+  userData.address ? (updateUser.address = userData.address) : '';
+  userData.photoUrl ? (updateUser.photoUrl = userData.photoUrl) : '';
+  saveUserData(existUsers);
+
+  res
+    .status(200)
+    .send({ success: true, message: 'User data updated successfully' });
 };
 
+// update multiple user
+module.exports.bulkUpdate = (req, res) => {
+  const userData = req.body;
+  const existUsers = getUserData();
+
+  if (userData.length < 2) {
+    return res
+      .status(404)
+      .send({ error: true, message: 'Please provide multiple user data' });
+  }
+
+  userData?.map((data) => {
+    const updateUser = existUsers.find((user) => user.id == data.id);
+    data.gender ? (updateUser.gender = data.gender) : '';
+    data.name ? (updateUser.name = data.name) : '';
+    data.contact ? (updateUser.contact = data.contact) : '';
+    data.address ? (updateUser.address = data.address) : '';
+    data.photoUrl ? (updateUser.photoUrl = data.photoUrl) : '';
+  });
+
+  saveUserData(existUsers);
+
+  res.status(200).send({
+    success: true,
+    message: 'Multiple user data updated successfully',
+  });
+};
+
+// delete a user
 module.exports.deleteUser = (req, res) => {
-  res.send('deleted');
+  const id = req.params.id;
+  const existUsers = getUserData();
+
+  const isExist = existUsers.find((user) => user.id == id);
+  if (!isExist) {
+    return res.status(409).send({ error: true, message: 'User not exist' });
+  }
+
+  const filterUser = existUsers.filter((user) => user.id != id);
+  saveUserData(filterUser);
+
+  res.status(200).send({ success: true, message: 'User removed successfully' });
 };
